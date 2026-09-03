@@ -11,7 +11,6 @@
 <meta name="theme-color" content="#D7263D">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
@@ -91,7 +90,7 @@
   .wrap {
     max-width: 480px;
     margin: 0 auto;
-    padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+    padding: calc(20px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -298,7 +297,7 @@
   <p class="section-label"><span>Call history</span><button type="button" id="clearTried">Clear</button></p>
 
   <footer>
-    <p><strong>Put it on your home screen:</strong> in Safari tap Share, then "Add to Home Screen". It opens like an app.</p>
+    <p><strong>Put it on your home screen:</strong> open the long link in Safari, tap Share, then "Add to Home Screen". The link carries the driver list, so add it from the long link, not from the plain site address.</p>
     <p>Calls and texts use your phone's normal dialer and Messages. Nothing here is sent anywhere else.</p>
   </footer>
 </div>
