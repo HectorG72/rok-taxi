@@ -284,7 +284,7 @@
 
   <section class="loc-card" aria-labelledby="locTitle">
     <h2 class="display" id="locTitle">Where you are</h2>
-    <div class="loc-status" id="locStatus">Tap Find me to grab your GPS spot. The blue buttons then text a map link to that driver.</div>
+    <div class="loc-status" id="locStatus">Finding you… The blue buttons text a map link of this spot to that driver.</div>
     <div class="loc-actions">
       <button type="button" class="btn" id="findMe">Find me</button>
       <button type="button" class="btn quiet" id="copyLoc">Copy map link</button>
@@ -444,8 +444,16 @@
     }
     var s = e.target.closest && e.target.closest("a[data-sms]");
     if (s) {
-      // Refresh the body right before leaving, in case the landmark just changed.
-      s.setAttribute("href", smsHref(s.getAttribute("data-sms")));
+      var num = s.getAttribute("data-sms");
+      if (loc) {
+        // Refresh the body right before leaving, in case the landmark just changed.
+        s.setAttribute("href", smsHref(num));
+        return;
+      }
+      // No fix yet: grab one first, then open Messages with whatever we got.
+      e.preventDefault();
+      toast("Finding your spot first…");
+      locate(function () { window.location.href = smsHref(num); });
     }
   });
 
@@ -457,18 +465,32 @@
   var status = document.getElementById("locStatus");
   function setStatus(text, cls) { status.textContent = text; status.className = "loc-status" + (cls ? " " + cls : ""); }
 
-  document.getElementById("findMe").addEventListener("click", function () {
-    if (!navigator.geolocation) { setStatus("This browser can't share location. Type a landmark instead.", "warn"); return; }
-    setStatus("Finding you…");
+  var locating = false;
+  function locate(done) {
+    if (!navigator.geolocation) { setStatus("This phone can't share location here. Type a landmark instead.", "warn"); if (done) done(false); return; }
+    if (locating) { if (done) done(!!loc); return; }
+    locating = true;
+    setStatus(loc ? "Updating your spot…" : "Finding you…");
     navigator.geolocation.getCurrentPosition(function (pos) {
-      loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy };
+      locating = false;
+      loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy, at: Date.now() };
       setStatus("Locked: " + loc.lat.toFixed(5) + ", " + loc.lng.toFixed(5) + "  (±" + Math.round(loc.acc) + " m)", "ok");
       render();
+      if (done) done(true);
     }, function (err) {
-      var why = err.code === 1 ? "Location is blocked for this page. Allow it in Settings › Safari › Location, or type a landmark below."
-              : "Couldn't get a fix. Step out from under cover and try again, or type a landmark below.";
+      locating = false;
+      var why = err.code === 1 ? "Location is blocked. On iPhone: Settings › Privacy & Security › Location Services › Safari Websites (or this app) › While Using. Or type a landmark below."
+              : "Couldn't get a GPS fix. Step out from under cover and tap Find me, or type a landmark below.";
       setStatus(why, "warn");
-    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+      if (done) done(false);
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 20000 });
+  }
+  document.getElementById("findMe").addEventListener("click", function () { locate(); });
+
+  // Find the phone as soon as the app opens, and again when it comes back to the front.
+  locate();
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && (!loc || Date.now() - loc.at > 60000)) locate();
   });
 
   document.getElementById("copyLoc").addEventListener("click", function () {
