@@ -1,7 +1,7 @@
 # Rocklahoma Cart Taxi
 
-One-tap dialer for the golf cart taxi drivers at Rocklahoma. Single static page.
+One-tap dialer for the golf cart taxi drivers at Rocklahoma. Single static page,
+hosted at https://hectorg72.github.io/rok-taxi/
 
-The driver list is **not** in this repo. It travels in the URL hash (`#d=...`),
-which the browser never sends to the server, and is saved to the phone on first
-open. Use "Edit list" then "Copy link" inside the app to make a new link.
+The driver list is built into the page. A `#d=...` hash on the URL (made with
+"Edit list" → "Copy link" in the app) overrides it for that phone.

@@ -276,6 +276,7 @@
     <div id="editRows"></div>
     <div class="tools">
       <button type="button" class="btn" id="addRow">+ Add driver</button>
+      <button type="button" class="btn" id="resetDefaults">Reset list</button>
       <button type="button" class="btn" id="copyLink">Copy link</button>
       <button type="button" class="btn save" id="saveEdit">Save</button>
     </div>
@@ -297,7 +298,7 @@
   <p class="section-label"><span>Call history</span><button type="button" id="clearTried">Clear</button></p>
 
   <footer>
-    <p><strong>Put it on your home screen:</strong> open the long link in Safari, tap Share, then "Add to Home Screen". The link carries the driver list, so add it from the long link, not from the plain site address.</p>
+    <p><strong>Put it on your home screen:</strong> in Safari tap Share, then "Add to Home Screen". It opens like an app.</p>
     <p>Calls and texts use your phone's normal dialer and Messages. Nothing here is sent anywhere else.</p>
   </footer>
 </div>
@@ -306,9 +307,29 @@
 
 <script>
 (function () {
-  // The driver list is never stored in this file. It rides in the URL hash
-  // (#d=...), which the browser never sends to the server, and is saved on
-  // the phone the first time the page opens.
+  var DEFAULTS = [
+    { name: "Caitie",      num: "405-637-6838" },
+    { name: "Angel",       num: "920-501-6212" },
+    { name: "Brandi/Nova", num: "910-514-4611" },
+    { name: "Shannon",     num: "207-431-8435" },
+    { name: "Tonya",       num: "918-637-7592" },
+    { name: "Alexa",       num: "419-308-2038" },
+    { name: "Jackie",      num: "912-850-4453" },
+    { name: "Kassidy",     num: "912-592-0430" },
+    { name: "Julius",      num: "678-898-8318" },
+    { name: "Paula",       num: "918-951-9054" },
+    { name: "Arnetta",     num: "918-809-7253" },
+    { name: "Josh",        num: "417-838-3494" },
+    { name: "Mowgli",      num: "405-760-3482" },
+    { name: "Sumerjean",   num: "405-885-2588" },
+    { name: "Amanda",      num: "912-755-1830" },
+    { name: "Chloie",      num: "404-558-2113" },
+    { name: "Ashley",      num: "716-990-4458" },
+    { name: "Cris",        num: "719-217-4818" },
+    { name: "Fredrick",    num: "918-378-3197" },
+    { name: "Finn",        num: "423-637-5889" }
+  ];
+  // A link with #d=... overrides the list above (the hash never reaches the server). It rides in the URL hash
   function b64uEnc(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
   function b64uDec(str) { str = str.replace(/-/g, "+").replace(/_/g, "/"); while (str.length % 4) str += "="; return decodeURIComponent(escape(atob(str))); }
   function driversFromHash() {
@@ -334,7 +355,7 @@
 
   var fromHash = driversFromHash();
   if (fromHash) save(KEY_DRIVERS, fromHash);
-  var drivers = fromHash || load(KEY_DRIVERS, null) || [];
+  var drivers = fromHash || load(KEY_DRIVERS, null) || DEFAULTS.slice();
   var tried = load(KEY_TRIED, {});
   var loc = null;
 
@@ -390,7 +411,7 @@
         '</a>' +
         '<a class="btn text-loc" href="' + smsHref(first.num) + '" data-sms="' + esc(first.num) + '" aria-label="Text my location to ' + esc(first.name) + '">' + pinSvg + '<span>Text spot</span></a>';
     } else {
-      pr.innerHTML = '<p class="hint">No drivers on this phone yet. Open the link Heath saved (it carries the list), or tap Edit list to type them in.</p>';
+      pr.innerHTML = '<p class="hint">No drivers. Tap Edit list, then Reset list.</p>';
     }
 
     var list = document.getElementById("list");
@@ -491,6 +512,9 @@
   });
   editRows.addEventListener("click", function (e) {
     if (e.target.classList.contains("del")) e.target.parentNode.remove();
+  });
+  document.getElementById("resetDefaults").addEventListener("click", function () {
+    editRows.innerHTML = DEFAULTS.map(function (d) { return editRowHtml(d.name, d.num); }).join("");
   });
   document.getElementById("copyLink").addEventListener("click", function () {
     var link = linkForList(drivers);
