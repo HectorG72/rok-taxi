@@ -1,0 +1,9 @@
+{
+  "name": "Rocklahoma Cart Taxi",
+  "short_name": "Cart Taxi",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#14181E",
+  "theme_color": "#D7263D",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png" }]
+}

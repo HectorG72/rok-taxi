@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rocklahoma Cart Taxi</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cart Taxi">
+<meta name="theme-color" content="#D7263D">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #F2F4F7;
+    --surface: #FFFFFF;
+    --surface-2: #E6EAF0;
+    --ink: #1B222B;
+    --ink-2: #5A6573;
+    --line: #CBD3DD;
+    --accent: #D7263D;
+    --accent-ink: #FFFFFF;
+    --accent-press: #B51E31;
+    --loc: #2E6F8E;
+    --loc-ink: #FFFFFF;
+    --ok: #2E8B57;
+    --ok-bg: #E3F3EA;
+    --warn-bg: #FFF3D6;
+    --warn-ink: #7A5200;
+    --focus: #2E6F8E;
+    --shadow: 0 1px 2px rgba(20, 24, 30, .08), 0 4px 14px rgba(20, 24, 30, .08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14181E;
+      --surface: #1E242C;
+      --surface-2: #2A323C;
+      --ink: #EEF1F5;
+      --ink-2: #A3ADBA;
+      --line: #3A434F;
+      --accent: #E8384F;
+      --accent-ink: #FFFFFF;
+      --accent-press: #C42A3F;
+      --loc: #4C9BBF;
+      --loc-ink: #0E1419;
+      --ok: #5CC28A;
+      --ok-bg: #1F3A2C;
+      --warn-bg: #3E3312;
+      --warn-ink: #F3D27A;
+      --focus: #4C9BBF;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14181E;
+    --surface: #1E242C;
+    --surface-2: #2A323C;
+    --ink: #EEF1F5;
+    --ink-2: #A3ADBA;
+    --line: #3A434F;
+    --accent: #E8384F;
+    --accent-ink: #FFFFFF;
+    --accent-press: #C42A3F;
+    --loc: #4C9BBF;
+    --loc-ink: #0E1419;
+    --ok: #5CC28A;
+    --ok-bg: #1F3A2C;
+    --warn-bg: #3E3312;
+    --warn-ink: #F3D27A;
+    --focus: #4C9BBF;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .display { font-family: "Bebas Neue", "Oswald", "Arial Narrow", Impact, sans-serif; letter-spacing: .02em; }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  header { display: flex; flex-direction: column; gap: 2px; }
+  header h1 { margin: 0; font-size: 44px; line-height: 1; font-weight: 400; }
+  header p { margin: 0; color: var(--ink-2); font-size: 14px; text-transform: uppercase; letter-spacing: .08em; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    appearance: none;
+    border: 0;
+    border-radius: 14px;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 22px 22px;
+    box-shadow: var(--shadow);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .primary:active { background: var(--accent-press); transform: translateY(1px); }
+  .primary .eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; opacity: .85; }
+  .primary .name { font-size: 64px; line-height: .95; }
+  .primary .num { font-size: 20px; font-variant-numeric: tabular-nums; opacity: .92; }
+  .primary .tried-mark { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; background: rgba(255,255,255,.22); padding: 3px 9px; border-radius: 999px; }
+
+  .primary-row { display: flex; gap: 10px; }
+  .primary-row .primary { flex: 1; }
+  .primary-row .text-loc { width: 84px; flex-direction: column; justify-content: center; }
+
+  /* ---- Driver list ---- */
+  .section-label {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ink-2);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .section-label button {
+    appearance: none; border: 0; background: none; font: inherit; color: var(--loc);
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; padding: 0;
+  }
+  .section-label button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+  .list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
+  .row { display: flex; gap: 8px; }
+  .call {
+    flex: 1;
+    background: var(--surface);
+    padding: 12px 16px;
+    box-shadow: var(--shadow);
+    min-height: 72px;
+  }
+  .call:active { background: var(--surface-2); }
+  .call .who { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+  .call .name { font-size: 34px; line-height: 1; }
+  .call .num { font-size: 16px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .call .state { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); white-space: nowrap; }
+  .row.tried .call { background: var(--ok-bg); }
+  .row.tried .call .state { color: var(--ok); font-weight: 600; }
+  .text-loc {
+    background: var(--loc);
+    color: var(--loc-ink);
+    width: 72px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    box-shadow: var(--shadow);
+    text-align: center;
+    line-height: 1.1;
+  }
+  .text-loc:active { filter: brightness(.9); }
+  .text-loc svg { width: 22px; height: 22px; display: block; }
+
+  /* ---- Location ---- */
+  .loc-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .loc-card h2 { margin: 0; font-size: 30px; line-height: 1; font-weight: 400; }
+  .loc-status {
+    font-size: 15px;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+    min-height: 1.4em;
+  }
+  .loc-status.warn { background: var(--warn-bg); color: var(--warn-ink); padding: 8px 10px; border-radius: 8px; }
+  .loc-status.ok { color: var(--ok); font-weight: 500; }
+  .loc-actions { display: flex; gap: 8px; }
+  .loc-actions .btn {
+    flex: 1; justify-content: center; padding: 14px 12px; font-weight: 600; font-size: 16px;
+    background: var(--loc); color: var(--loc-ink);
+  }
+  .loc-actions .btn.quiet { background: var(--surface-2); color: var(--ink); }
+  .loc-actions .btn:active { filter: brightness(.9); }
+  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
+  label.field input {
+    font: inherit; font-size: 17px; letter-spacing: 0; text-transform: none;
+    padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink);
+  }
+  label.field input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; border-color: transparent; }
+  .preview {
+    font-size: 14px; color: var(--ink-2); background: var(--bg); border-radius: 8px; padding: 10px 12px;
+    word-break: break-word; line-height: 1.45;
+  }
+  .preview strong { color: var(--ink); font-weight: 500; }
+
+  /* ---- Edit mode ---- */
+  .editor { display: none; flex-direction: column; gap: 8px; }
+  body.editing .editor { display: flex; }
+  body.editing .list, body.editing .primary-row { display: none; }
+  .editor .erow { display: grid; grid-template-columns: 1fr 1.3fr 36px; gap: 6px; align-items: center; }
+  .editor input {
+    font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink); min-width: 0; font-variant-numeric: tabular-nums;
+  }
+  .editor input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .editor .del { appearance: none; border: 0; background: var(--surface-2); color: var(--ink-2); border-radius: 8px; height: 40px; font-size: 20px; cursor: pointer; }
+  .editor .tools { display: flex; gap: 8px; margin-top: 4px; }
+  .editor .tools .btn { flex: 1; justify-content: center; padding: 12px; font-weight: 600; background: var(--surface-2); }
+  .editor .tools .btn.save { background: var(--accent); color: var(--accent-ink); }
+  .hint { font-size: 13px; color: var(--ink-2); margin: 0; }
+
+  footer { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  footer p { margin: 0 0 6px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 500;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="display">Cart Taxi</h1>
+    <p>Rocklahoma · Pryor Creek, OK</p>
+  </header>
+
+  <div class="primary-row" id="primaryRow"></div>
+
+  <p class="section-label">
+    <span>No answer? Try the next one</span>
+    <button type="button" id="editBtn">Edit list</button>
+  </p>
+
+  <ul class="list" id="list"></ul>
+
+  <div class="editor" id="editor">
+    <p class="hint">First row is who gets the big red button. Names and numbers are saved on this phone only. Copy link makes a link that carries the list, for another phone or a fresh install.</p>
+    <div id="editRows"></div>
+    <div class="tools">
+      <button type="button" class="btn" id="addRow">+ Add driver</button>
+      <button type="button" class="btn" id="copyLink">Copy link</button>
+      <button type="button" class="btn save" id="saveEdit">Save</button>
+    </div>
+  </div>
+
+  <section class="loc-card" aria-labelledby="locTitle">
+    <h2 class="display" id="locTitle">Where you are</h2>
+    <div class="loc-status" id="locStatus">Tap Find me to grab your GPS spot. The blue buttons then text a map link to that driver.</div>
+    <div class="loc-actions">
+      <button type="button" class="btn" id="findMe">Find me</button>
+      <button type="button" class="btn quiet" id="copyLoc">Copy map link</button>
+    </div>
+    <label class="field">Landmark (optional)
+      <input type="text" id="landmark" placeholder="by the Ferris wheel, main stage left…" autocomplete="off" enterkeyhint="done">
+    </label>
+    <div class="preview" id="preview"></div>
+  </section>
+
+  <p class="section-label"><span>Call history</span><button type="button" id="clearTried">Clear</button></p>
+
+  <footer>
+    <p><strong>Put it on your home screen:</strong> in Safari tap Share, then "Add to Home Screen". It opens like an app.</p>
+    <p>Calls and texts use your phone's normal dialer and Messages. Nothing here is sent anywhere else.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  // The driver list is never stored in this file. It rides in the URL hash
+  // (#d=...), which the browser never sends to the server, and is saved on
+  // the phone the first time the page opens.
+  function b64uEnc(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+  function b64uDec(str) { str = str.replace(/-/g, "+").replace(/_/g, "/"); while (str.length % 4) str += "="; return decodeURIComponent(escape(atob(str))); }
+  function driversFromHash() {
+    var m = /[#&]d=([A-Za-z0-9_-]+)/.exec(location.hash);
+    if (!m) return null;
+    try {
+      var arr = JSON.parse(b64uDec(m[1]));
+      return arr.map(function (x) { return { name: String(x[0]), num: String(x[1]) }; });
+    } catch (e) { return null; }
+  }
+  function linkForList(list) {
+    var data = b64uEnc(JSON.stringify(list.map(function (d) { return [d.name, d.num]; })));
+    return location.origin + location.pathname + "#d=" + data;
+  }
+  var KEY_DRIVERS = "rok.drivers.v1";
+  var KEY_TRIED = "rok.tried.v1";
+  var KEY_LANDMARK = "rok.landmark.v1";
+
+  function load(key, fallback) {
+    try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+
+  var fromHash = driversFromHash();
+  if (fromHash) save(KEY_DRIVERS, fromHash);
+  var drivers = fromHash || load(KEY_DRIVERS, null) || [];
+  var tried = load(KEY_TRIED, {});
+  var loc = null;
+
+  var isAndroid = /android/i.test(navigator.userAgent);
+
+  function digits(n) { return String(n).replace(/\D/g, ""); }
+  function telHref(n) { var d = digits(n); return "tel:" + (d.length === 10 ? "+1" + d : "+" + d); }
+  function fmt(n) {
+    var d = digits(n);
+    if (d.length === 11 && d[0] === "1") d = d.slice(1);
+    if (d.length === 10) return d.slice(0, 3) + "-" + d.slice(3, 6) + "-" + d.slice(6);
+    return n;
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function mapLink() { return loc ? "https://www.google.com/maps?q=" + loc.lat.toFixed(6) + "," + loc.lng.toFixed(6) : ""; }
+  function messageBody() {
+    var parts = ["Hey, this is Heath. Can I get a cart ride?"];
+    var lm = document.getElementById("landmark").value.trim();
+    if (loc) parts.push("My location: " + mapLink());
+    if (lm) parts.push("I'm " + lm + ".");
+    if (!loc && !lm) parts.push("(location not attached)");
+    return parts.join(" ");
+  }
+  function smsHref(n) {
+    var d = digits(n); var to = d.length === 10 ? "+1" + d : "+" + d;
+    var body = encodeURIComponent(messageBody());
+    return "sms:" + to + (isAndroid ? "?" : "&") + "body=" + body;
+  }
+
+  function timeAgo(ts) {
+    var m = Math.round((Date.now() - ts) / 60000);
+    if (m < 1) return "just now";
+    if (m < 60) return m + " min ago";
+    var h = Math.round(m / 60);
+    return h + " hr ago";
+  }
+
+  var pinSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg>';
+
+  function render() {
+    var first = drivers[0];
+    var rest = drivers.slice(1);
+    var pr = document.getElementById("primaryRow");
+    if (first) {
+      var t = tried[first.num];
+      pr.innerHTML =
+        '<a class="btn primary" href="' + telHref(first.num) + '" data-num="' + esc(first.num) + '">' +
+          '<span class="eyebrow">Call first</span>' +
+          '<span class="name display">' + esc(first.name) + '</span>' +
+          '<span class="num">' + esc(fmt(first.num)) + '</span>' +
+          (t ? '<span class="tried-mark">Called ' + timeAgo(t) + '</span>' : '') +
+        '</a>' +
+        '<a class="btn text-loc" href="' + smsHref(first.num) + '" data-sms="' + esc(first.num) + '" aria-label="Text my location to ' + esc(first.name) + '">' + pinSvg + '<span>Text spot</span></a>';
+    } else {
+      pr.innerHTML = '<p class="hint">No drivers on this phone yet. Open the link Heath saved (it carries the list), or tap Edit list to type them in.</p>';
+    }
+
+    var list = document.getElementById("list");
+    list.innerHTML = rest.map(function (d) {
+      var t = tried[d.num];
+      return '<li class="row' + (t ? " tried" : "") + '">' +
+        '<a class="btn call" href="' + telHref(d.num) + '" data-num="' + esc(d.num) + '">' +
+          '<span class="who"><span class="name display">' + esc(d.name) + '</span><span class="num">' + esc(fmt(d.num)) + '</span></span>' +
+          '<span class="state">' + (t ? "Called " + timeAgo(t) : "") + '</span>' +
+        '</a>' +
+        '<a class="btn text-loc" href="' + smsHref(d.num) + '" data-sms="' + esc(d.num) + '" aria-label="Text my location to ' + esc(d.name) + '">' + pinSvg + '<span>Text spot</span></a>' +
+      '</li>';
+    }).join("");
+    renderPreview();
+  }
+
+  function renderPreview() {
+    var p = document.getElementById("preview");
+    p.innerHTML = '<strong>Text they\'ll get:</strong> ' + esc(messageBody());
+  }
+
+  // Mark as tried when a call link is tapped. The tap still follows the tel: link.
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[data-num]");
+    if (a) {
+      tried[a.getAttribute("data-num")] = Date.now();
+      save(KEY_TRIED, tried);
+      setTimeout(render, 300);
+      return;
+    }
+    var s = e.target.closest && e.target.closest("a[data-sms]");
+    if (s) {
+      // Refresh the body right before leaving, in case the landmark just changed.
+      s.setAttribute("href", smsHref(s.getAttribute("data-sms")));
+    }
+  });
+
+  document.getElementById("clearTried").addEventListener("click", function () {
+    tried = {}; save(KEY_TRIED, tried); render(); toast("Call history cleared");
+  });
+
+  // ---- Location ----
+  var status = document.getElementById("locStatus");
+  function setStatus(text, cls) { status.textContent = text; status.className = "loc-status" + (cls ? " " + cls : ""); }
+
+  document.getElementById("findMe").addEventListener("click", function () {
+    if (!navigator.geolocation) { setStatus("This browser can't share location. Type a landmark instead.", "warn"); return; }
+    setStatus("Finding you…");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      loc = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy };
+      setStatus("Locked: " + loc.lat.toFixed(5) + ", " + loc.lng.toFixed(5) + "  (±" + Math.round(loc.acc) + " m)", "ok");
+      render();
+    }, function (err) {
+      var why = err.code === 1 ? "Location is blocked for this page. Allow it in Settings › Safari › Location, or type a landmark below."
+              : "Couldn't get a fix. Step out from under cover and try again, or type a landmark below.";
+      setStatus(why, "warn");
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+  });
+
+  document.getElementById("copyLoc").addEventListener("click", function () {
+    if (!loc) { toast("Tap Find me first"); return; }
+    var link = mapLink();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(function () { toast("Map link copied"); }, function () { fallbackCopy(link); });
+    } else { fallbackCopy(link); }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast("Map link copied"); } catch (e) { toast("Couldn't copy"); }
+    document.body.removeChild(ta);
+  }
+
+  var landmark = document.getElementById("landmark");
+  landmark.value = load(KEY_LANDMARK, "");
+  landmark.addEventListener("input", function () { save(KEY_LANDMARK, landmark.value); render(); });
+
+  // ---- Edit mode ----
+  var editBtn = document.getElementById("editBtn");
+  var editRows = document.getElementById("editRows");
+  function openEditor() {
+    editRows.innerHTML = drivers.map(function (d) { return editRowHtml(d.name, d.num); }).join("");
+    document.body.classList.add("editing");
+    editBtn.textContent = "Cancel";
+  }
+  function closeEditor() { document.body.classList.remove("editing"); editBtn.textContent = "Edit list"; }
+  function editRowHtml(name, num) {
+    return '<div class="erow">' +
+      '<input type="text" value="' + esc(name) + '" placeholder="Name" aria-label="Name">' +
+      '<input type="tel" value="' + esc(num) + '" placeholder="Phone" aria-label="Phone" inputmode="tel">' +
+      '<button type="button" class="del" aria-label="Remove">×</button></div>';
+  }
+  editBtn.addEventListener("click", function () {
+    if (document.body.classList.contains("editing")) closeEditor(); else openEditor();
+  });
+  document.getElementById("addRow").addEventListener("click", function () {
+    editRows.insertAdjacentHTML("beforeend", editRowHtml("", ""));
+    var inputs = editRows.querySelectorAll("input"); inputs[inputs.length - 2].focus();
+  });
+  editRows.addEventListener("click", function (e) {
+    if (e.target.classList.contains("del")) e.target.parentNode.remove();
+  });
+  document.getElementById("copyLink").addEventListener("click", function () {
+    var link = linkForList(drivers);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(function () { toast("Link copied. Open it to install with this list."); }, function () { fallbackCopy(link); });
+    } else { fallbackCopy(link); }
+  });
+  document.getElementById("saveEdit").addEventListener("click", function () {
+    var rows = editRows.querySelectorAll(".erow");
+    var next = [];
+    rows.forEach(function (r) {
+      var i = r.querySelectorAll("input");
+      var name = i[0].value.trim(), num = i[1].value.trim();
+      if (name && digits(num).length >= 7) next.push({ name: name, num: fmt(num) });
+    });
+    drivers = next; save(KEY_DRIVERS, drivers);
+    try { history.replaceState(null, "", linkForList(drivers)); } catch (e) {}
+    closeEditor(); render(); toast("List saved");
+  });
+
+  // ---- Toast ----
+  var toastEl = document.getElementById("toast"), toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+  }
+
+  render();
+  // Keep "called X min ago" fresh while the page sits open.
+  setInterval(function () { if (!document.body.classList.contains("editing")) render(); }, 60000);
+})();
+</script>
+</body>
+</html>
