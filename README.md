@@ -1,4 +1,4 @@
-# Rocklahoma Cart Taxi
+# Rok-Taxi
 
 One-tap dialer for the golf cart taxi drivers at Rocklahoma. Single static page,
 hosted at https://hectorg72.github.io/rok-taxi/
