@@ -190,6 +190,8 @@
     background: var(--bg); color: var(--ink);
   }
   label.field input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; border-color: transparent; }
+  label.check { display: flex; align-items: center; gap: 10px; font-size: 16px; color: var(--ink); cursor: pointer; }
+  label.check input { width: 22px; height: 22px; margin: 0; accent-color: var(--loc); }
   .preview {
     font-size: 14px; color: var(--ink-2); background: var(--bg); border-radius: 8px; padding: 10px 12px;
     word-break: break-word; line-height: 1.45;
@@ -268,6 +270,7 @@
       <label class="field">Landmark (optional)
         <input type="text" id="landmark" placeholder="by the Ferris wheel, main stage left…" autocomplete="off" enterkeyhint="done">
       </label>
+      <label class="check"><input type="checkbox" id="toCamp" checked> Take me back to my campsite</label>
     </div>
     <label class="field">My campsite
       <input type="text" id="campsite" placeholder="Quail's Nest 9-68" autocomplete="off" enterkeyhint="done">
@@ -360,16 +363,17 @@
 
   function mapLink() { return loc ? "https://www.google.com/maps?q=" + loc.lat.toFixed(6) + "," + loc.lng.toFixed(6) : ""; }
   function messageBody() {
-    var parts = ["Hey, this is Heath. Can I get a cart ride?"];
     var lm = document.getElementById("landmark").value.trim();
     var camp = document.getElementById("campsite").value.trim();
+    var toCamp = document.getElementById("toCamp").checked && camp;
+    var parts = ["Hey, this is Heath. Can I get a cart ride?"];
     if (pickup === "camp") {
-      parts.push(camp ? "Pick me up at my campsite: " + camp + "." : "Pick me up at my campsite.");
+      parts.push(camp ? "I'm at my campsite, " + camp + "." : "I'm at my campsite.");
     } else {
-      if (loc) parts.push("Pick me up here: " + mapLink());
-      if (lm) parts.push("I'm " + lm + ".");
+      if (loc) parts.push("I'm here: " + mapLink());
+      if (lm) parts.push("Look for me " + lm + ".");
       if (!loc && !lm) parts.push("(location not attached yet)");
-      if (camp) parts.push("My campsite is " + camp + ".");
+      if (toCamp) parts.push("Heading back to my campsite, " + camp + ".");
     }
     return parts.join(" ");
   }
@@ -503,6 +507,7 @@
   landmark.value = load(KEY_LANDMARK, "");
   landmark.addEventListener("input", function () { save(KEY_LANDMARK, landmark.value); render(); });
 
+  document.getElementById("toCamp").addEventListener("change", render);
   var campsite = document.getElementById("campsite");
   campsite.value = load(KEY_CAMPSITE, DEFAULT_CAMPSITE);
   campsite.addEventListener("input", function () { save(KEY_CAMPSITE, campsite.value); render(); });
