@@ -282,6 +282,7 @@
   <footer>
     <p><strong>Put it on your home screen:</strong> in Safari tap Share, then "Add to Home Screen". It opens like an app.</p>
     <p>"Save all drivers to Contacts" opens a contact card file. Tap "Add All Contacts" on the sheet that appears. They're filed under Rocklahoma Cart Taxi.</p>
+    <p><strong>No signal?</strong> Once this app has opened with data one time, it opens without it. Calling and texting only need cell service, and GPS works with no data. The driver needs data to open the map link, so texting your campsite or a landmark is the safest bet.</p>
     <p>Calls and texts use your phone's normal dialer and Messages. Nothing here is sent anywhere else.</p>
   </footer>
 </div>
@@ -570,6 +571,11 @@
   function toast(msg) {
     toastEl.textContent = msg; toastEl.classList.add("show");
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+  }
+
+  // Cache the app on the phone so it opens with no data connection.
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
   }
 
   render();
