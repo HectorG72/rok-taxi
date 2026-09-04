@@ -286,11 +286,11 @@
 
   <p class="section-label"><span>Call history</span><button type="button" id="clearTried">Clear</button></p>
 
-  <a class="btn contacts" href="drivers.vcf" download="rocklahoma-drivers.vcf">Download driver contacts</a>
+  <button type="button" class="btn contacts" id="shareContacts">Add drivers to Contacts</button>
 
   <footer>
     <p><strong>Put it on your home screen:</strong> in Safari tap Share, then "Add to Home Screen". It opens like an app.</p>
-    <p><strong>Adding drivers to Contacts:</strong> Safari only imports the first card in a file. Press and hold "Download driver contacts", choose "Download Linked File", then open the Files app, tap the file in Downloads, and tap "Add All Contacts".</p>
+    <p><strong>Adding drivers to Contacts:</strong> tap "Add drivers to Contacts", then on the share sheet pick <strong>Save to Files</strong>. Open the Files app, tap the saved file, and tap <strong>Add All Contacts</strong>. Sending it to yourself in Messages or Mail works the same way.</p>
     <p><strong>No signal?</strong> Once this app has opened with data one time, it opens without it. Calling and texting only need cell service, and GPS works with no data. The driver needs data to open the map link, so texting your campsite or a landmark is the safest bet.</p>
     <p>Calls and texts use your phone's normal dialer and Messages. Nothing here is sent anywhere else.</p>
   </footer>
@@ -585,6 +585,25 @@
     drivers = next; save(KEY_DRIVERS, drivers);
     try { history.replaceState(null, "", linkForList(drivers)); } catch (e) {}
     closeEditor(); render(); toast("List saved");
+  });
+
+  // ---- Contacts: build a vCard from the current list and hand it to the share sheet ----
+  function vcardText() {
+    return drivers.map(function (d) {
+      var dg = digits(d.num); var tel = dg.length === 10 ? "+1" + dg : "+" + dg;
+      return ["BEGIN:VCARD", "VERSION:3.0", "N:Cart Taxi;" + d.name + ";;;", "FN:" + d.name + " Cart Taxi",
+              "ORG:Rocklahoma Cart Taxi", "TEL;TYPE=CELL,VOICE:" + tel, "NOTE:Golf cart taxi driver, Rocklahoma 2026", "END:VCARD"].join("\r\n");
+    }).join("\r\n") + "\r\n";
+  }
+  document.getElementById("shareContacts").addEventListener("click", function () {
+    var file;
+    try { file = new File([vcardText()], "rocklahoma-drivers.vcf", { type: "text/vcard" }); } catch (e) {}
+    if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: "Rok-Taxi drivers" }).catch(function () {});
+    } else {
+      // Older browsers: open the hosted file. Safari shows one card at a time from here.
+      window.location.href = "drivers.vcf";
+    }
   });
 
   // ---- Toast ----
