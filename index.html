@@ -6,15 +6,16 @@
 <title>Rocklahoma Cart Taxi</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Cart Taxi">
-<meta name="theme-color" content="#D7263D">
+<meta name="theme-color" content="#F2F4F7">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
   :root {
+    color-scheme: light;
     --bg: #F2F4F7;
     --surface: #FFFFFF;
     --surface-2: #E6EAF0;
@@ -33,47 +34,6 @@
     --focus: #2E6F8E;
     --shadow: 0 1px 2px rgba(20, 24, 30, .08), 0 4px 14px rgba(20, 24, 30, .08);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #14181E;
-      --surface: #1E242C;
-      --surface-2: #2A323C;
-      --ink: #EEF1F5;
-      --ink-2: #A3ADBA;
-      --line: #3A434F;
-      --accent: #E8384F;
-      --accent-ink: #FFFFFF;
-      --accent-press: #C42A3F;
-      --loc: #4C9BBF;
-      --loc-ink: #0E1419;
-      --ok: #5CC28A;
-      --ok-bg: #1F3A2C;
-      --warn-bg: #3E3312;
-      --warn-ink: #F3D27A;
-      --focus: #4C9BBF;
-      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .35);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #14181E;
-    --surface: #1E242C;
-    --surface-2: #2A323C;
-    --ink: #EEF1F5;
-    --ink-2: #A3ADBA;
-    --line: #3A434F;
-    --accent: #E8384F;
-    --accent-ink: #FFFFFF;
-    --accent-press: #C42A3F;
-    --loc: #4C9BBF;
-    --loc-ink: #0E1419;
-    --ok: #5CC28A;
-    --ok-bg: #1F3A2C;
-    --warn-bg: #3E3312;
-    --warn-ink: #F3D27A;
-    --focus: #4C9BBF;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .35);
-  }
-
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -214,6 +174,15 @@
   }
   .loc-actions .btn.quiet { background: var(--surface-2); color: var(--ink); }
   .loc-actions .btn:active { filter: brightness(.9); }
+  .seg { display: flex; background: var(--surface-2); border-radius: 12px; padding: 4px; gap: 4px; }
+  .seg button {
+    flex: 1; appearance: none; border: 0; background: transparent; font: inherit; font-weight: 600; font-size: 16px;
+    padding: 12px 8px; border-radius: 9px; color: var(--ink-2); cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .seg button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .gps-only { display: flex; flex-direction: column; gap: 12px; }
+  .loc-card.camp .gps-only { display: none; }
   label.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
   label.field input {
     font: inherit; font-size: 17px; letter-spacing: 0; text-transform: none;
@@ -243,6 +212,8 @@
   .editor .tools .btn.save { background: var(--accent); color: var(--accent-ink); }
   .hint { font-size: 13px; color: var(--ink-2); margin: 0; }
 
+  .contacts { justify-content: center; padding: 14px; font-weight: 600; background: var(--surface); box-shadow: var(--shadow); }
+  .contacts:active { background: var(--surface-2); }
   footer { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
   footer p { margin: 0 0 6px; }
 
@@ -282,23 +253,35 @@
     </div>
   </div>
 
-  <section class="loc-card" aria-labelledby="locTitle">
-    <h2 class="display" id="locTitle">Where you are</h2>
-    <div class="loc-status" id="locStatus">Finding you… The blue buttons text a map link of this spot to that driver.</div>
-    <div class="loc-actions">
-      <button type="button" class="btn" id="findMe">Find me</button>
-      <button type="button" class="btn quiet" id="copyLoc">Copy map link</button>
+  <section class="loc-card" id="locCard" aria-labelledby="locTitle">
+    <h2 class="display" id="locTitle">Pick me up</h2>
+    <div class="seg" role="group" aria-label="Pickup spot">
+      <button type="button" id="pickHere" aria-pressed="true">Where I am</button>
+      <button type="button" id="pickCamp" aria-pressed="false">At my campsite</button>
     </div>
-    <label class="field">Landmark (optional)
-      <input type="text" id="landmark" placeholder="by the Ferris wheel, main stage left…" autocomplete="off" enterkeyhint="done">
+    <div class="gps-only">
+      <div class="loc-status" id="locStatus">Finding you… The blue buttons text a map link of this spot to that driver.</div>
+      <div class="loc-actions">
+        <button type="button" class="btn" id="findMe">Find me</button>
+        <button type="button" class="btn quiet" id="copyLoc">Copy map link</button>
+      </div>
+      <label class="field">Landmark (optional)
+        <input type="text" id="landmark" placeholder="by the Ferris wheel, main stage left…" autocomplete="off" enterkeyhint="done">
+      </label>
+    </div>
+    <label class="field">My campsite
+      <input type="text" id="campsite" placeholder="Quail's Nest 9-68" autocomplete="off" enterkeyhint="done">
     </label>
     <div class="preview" id="preview"></div>
   </section>
 
   <p class="section-label"><span>Call history</span><button type="button" id="clearTried">Clear</button></p>
 
+  <a class="btn contacts" href="drivers.vcf">Save all drivers to Contacts</a>
+
   <footer>
     <p><strong>Put it on your home screen:</strong> in Safari tap Share, then "Add to Home Screen". It opens like an app.</p>
+    <p>"Save all drivers to Contacts" opens a contact card file. Tap "Add All Contacts" on the sheet that appears. They're filed under Rocklahoma Cart Taxi.</p>
     <p>Calls and texts use your phone's normal dialer and Messages. Nothing here is sent anywhere else.</p>
   </footer>
 </div>
@@ -347,6 +330,9 @@
   var KEY_DRIVERS = "rok.drivers.v1";
   var KEY_TRIED = "rok.tried.v1";
   var KEY_LANDMARK = "rok.landmark.v1";
+  var KEY_CAMPSITE = "rok.campsite.v1";
+  var DEFAULT_CAMPSITE = "Quail's Nest 9-68";
+  var pickup = "here";
 
   function load(key, fallback) {
     try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
@@ -375,9 +361,15 @@
   function messageBody() {
     var parts = ["Hey, this is Heath. Can I get a cart ride?"];
     var lm = document.getElementById("landmark").value.trim();
-    if (loc) parts.push("My location: " + mapLink());
-    if (lm) parts.push("I'm " + lm + ".");
-    if (!loc && !lm) parts.push("(location not attached)");
+    var camp = document.getElementById("campsite").value.trim();
+    if (pickup === "camp") {
+      parts.push(camp ? "Pick me up at my campsite: " + camp + "." : "Pick me up at my campsite.");
+    } else {
+      if (loc) parts.push("Pick me up here: " + mapLink());
+      if (lm) parts.push("I'm " + lm + ".");
+      if (!loc && !lm) parts.push("(location not attached yet)");
+      if (camp) parts.push("My campsite is " + camp + ".");
+    }
     return parts.join(" ");
   }
   function smsHref(n) {
@@ -445,7 +437,7 @@
     var s = e.target.closest && e.target.closest("a[data-sms]");
     if (s) {
       var num = s.getAttribute("data-sms");
-      if (loc) {
+      if (loc || pickup === "camp") {
         // Refresh the body right before leaving, in case the landmark just changed.
         s.setAttribute("href", smsHref(num));
         return;
@@ -509,6 +501,22 @@
   var landmark = document.getElementById("landmark");
   landmark.value = load(KEY_LANDMARK, "");
   landmark.addEventListener("input", function () { save(KEY_LANDMARK, landmark.value); render(); });
+
+  var campsite = document.getElementById("campsite");
+  campsite.value = load(KEY_CAMPSITE, DEFAULT_CAMPSITE);
+  campsite.addEventListener("input", function () { save(KEY_CAMPSITE, campsite.value); render(); });
+
+  var locCard = document.getElementById("locCard");
+  var pickHere = document.getElementById("pickHere"), pickCamp = document.getElementById("pickCamp");
+  function setPickup(mode) {
+    pickup = mode;
+    pickHere.setAttribute("aria-pressed", mode === "here" ? "true" : "false");
+    pickCamp.setAttribute("aria-pressed", mode === "camp" ? "true" : "false");
+    locCard.classList.toggle("camp", mode === "camp");
+    render();
+  }
+  pickHere.addEventListener("click", function () { setPickup("here"); });
+  pickCamp.addEventListener("click", function () { setPickup("camp"); });
 
   // ---- Edit mode ----
   var editBtn = document.getElementById("editBtn");
