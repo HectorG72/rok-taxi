@@ -27,6 +27,8 @@
     --accent-press: #B51E31;
     --loc: #2E6F8E;
     --loc-ink: #FFFFFF;
+    --camp: #3F7D3A;
+    --camp-ink: #FFFFFF;
     --ok: #2E8B57;
     --ok-bg: #E3F3EA;
     --warn-bg: #FFF3D6;
@@ -95,7 +97,8 @@
 
   .primary-row { display: flex; gap: 10px; }
   .primary-row .primary { flex: 1; }
-  .primary-row .text-loc { width: 84px; flex-direction: column; justify-content: center; }
+  .primary-row .text-col { display: flex; flex-direction: column; gap: 8px; width: 84px; }
+  .primary-row .text-col .text-loc { flex: 1; width: auto; }
 
   /* ---- Driver list ---- */
   .section-label {
@@ -133,7 +136,8 @@
   .text-loc {
     background: var(--loc);
     color: var(--loc-ink);
-    width: 72px;
+    width: 66px;
+    flex-shrink: 0;
     justify-content: center;
     flex-direction: column;
     gap: 2px;
@@ -146,6 +150,8 @@
     line-height: 1.1;
   }
   .text-loc:active { filter: brightness(.9); }
+  .text-loc.to-camp { background: var(--camp); color: var(--camp-ink); }
+  body.pick-camp .to-camp { display: none; }
   .text-loc svg { width: 22px; height: 22px; display: block; }
 
   /* ---- Location ---- */
@@ -362,24 +368,24 @@
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
   function mapLink() { return loc ? "https://www.google.com/maps?q=" + loc.lat.toFixed(6) + "," + loc.lng.toFixed(6) : ""; }
-  function messageBody() {
+  function messageBody(dest) {
     var lm = document.getElementById("landmark").value.trim();
-    var camp = document.getElementById("campsite").value.trim();
-    var toCamp = document.getElementById("toCamp").checked && camp;
-    var parts = ["Hey, this is Heath. Can I get a cart ride?"];
+    var camp = document.getElementById("campsite").value.trim() || "my campsite";
+    var parts = [];
     if (pickup === "camp") {
-      parts.push(camp ? "I'm at my campsite, " + camp + "." : "I'm at my campsite.");
+      parts.push("Hey, this is Heath. Can I get a cart ride? I'm at my campsite, " + camp + ".");
     } else {
+      parts.push(dest === "camp" ? "Hey, this is Heath. Can I get a cart ride to my campsite, " + camp + "?"
+                                 : "Hey, this is Heath. Can I get a cart ride?");
       if (loc) parts.push("I'm here: " + mapLink());
       if (lm) parts.push("Look for me " + lm + ".");
       if (!loc && !lm) parts.push("(location not attached yet)");
-      if (toCamp) parts.push("Heading back to my campsite, " + camp + ".");
     }
     return parts.join(" ");
   }
-  function smsHref(n) {
+  function smsHref(n, dest) {
     var d = digits(n); var to = d.length === 10 ? "+1" + d : "+" + d;
-    var body = encodeURIComponent(messageBody());
+    var body = encodeURIComponent(messageBody(dest));
     return "sms:" + to + (isAndroid ? "?" : "&") + "body=" + body;
   }
 
@@ -391,6 +397,11 @@
     return h + " hr ago";
   }
 
+  var tentSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18L12 4z"/><path d="M12 12l4 8M12 12l-4 8"/></svg>';
+  function textButtons(d) {
+    return '<a class="btn text-loc" href="' + smsHref(d.num, "spot") + '" data-sms="' + esc(d.num) + '" data-dest="spot" aria-label="Text my location to ' + esc(d.name) + '">' + pinSvg + '<span>Text spot</span></a>' +
+           '<a class="btn text-loc to-camp" href="' + smsHref(d.num, "camp") + '" data-sms="' + esc(d.num) + '" data-dest="camp" aria-label="Ask ' + esc(d.name) + ' for a ride to my campsite">' + tentSvg + '<span>To camp</span></a>';
+  }
   var pinSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.6"/></svg>';
 
   function render() {
@@ -406,7 +417,7 @@
           '<span class="num">' + esc(fmt(first.num)) + '</span>' +
           (t ? '<span class="tried-mark">Called ' + timeAgo(t) + '</span>' : '') +
         '</a>' +
-        '<a class="btn text-loc" href="' + smsHref(first.num) + '" data-sms="' + esc(first.num) + '" aria-label="Text my location to ' + esc(first.name) + '">' + pinSvg + '<span>Text spot</span></a>';
+        '<div class="text-col">' + textButtons(first) + '</div>';
     } else {
       pr.innerHTML = '<p class="hint">No drivers. Tap Edit list, then Reset list.</p>';
     }
@@ -418,8 +429,7 @@
         '<a class="btn call" href="' + telHref(d.num) + '" data-num="' + esc(d.num) + '">' +
           '<span class="who"><span class="name display">' + esc(d.name) + '</span><span class="num">' + esc(fmt(d.num)) + '</span></span>' +
           '<span class="state">' + (t ? "Called " + timeAgo(t) : "") + '</span>' +
-        '</a>' +
-        '<a class="btn text-loc" href="' + smsHref(d.num) + '" data-sms="' + esc(d.num) + '" aria-label="Text my location to ' + esc(d.name) + '">' + pinSvg + '<span>Text spot</span></a>' +
+        '</a>' + textButtons(d) +
       '</li>';
     }).join("");
     renderPreview();
@@ -427,7 +437,12 @@
 
   function renderPreview() {
     var p = document.getElementById("preview");
-    p.innerHTML = '<strong>Text they\'ll get:</strong> ' + esc(messageBody());
+    if (pickup === "camp") {
+      p.innerHTML = '<strong>Text spot sends:</strong> ' + esc(messageBody("spot"));
+    } else {
+      p.innerHTML = '<strong>Text spot sends:</strong> ' + esc(messageBody("spot")) +
+                    '<br><br><strong>To camp sends:</strong> ' + esc(messageBody("camp"));
+    }
   }
 
   // Mark as tried when a call link is tapped. The tap still follows the tel: link.
@@ -441,16 +456,16 @@
     }
     var s = e.target.closest && e.target.closest("a[data-sms]");
     if (s) {
-      var num = s.getAttribute("data-sms");
+      var num = s.getAttribute("data-sms"), dest = s.getAttribute("data-dest");
       if (loc || pickup === "camp") {
         // Refresh the body right before leaving, in case the landmark just changed.
-        s.setAttribute("href", smsHref(num));
+        s.setAttribute("href", smsHref(num, dest));
         return;
       }
       // No fix yet: grab one first, then open Messages with whatever we got.
       e.preventDefault();
       toast("Finding your spot first…");
-      locate(function () { window.location.href = smsHref(num); });
+      locate(function () { window.location.href = smsHref(num, dest); });
     }
   });
 
@@ -519,6 +534,7 @@
     pickHere.setAttribute("aria-pressed", mode === "here" ? "true" : "false");
     pickCamp.setAttribute("aria-pressed", mode === "camp" ? "true" : "false");
     locCard.classList.toggle("camp", mode === "camp");
+    document.body.classList.toggle("pick-camp", mode === "camp");
     render();
   }
   pickHere.addEventListener("click", function () { setPickup("here"); });
