@@ -1,6 +1,6 @@
 // Offline cache for the Cart Taxi app. Same-origin files are served from the
 // cache first and refreshed in the background; Google Fonts are cached when seen.
-var CACHE = "rok-taxi-v5";
+var CACHE = "rok-taxi-v6";
 var PRECACHE = ["./", "./index.html", "./icon.png", "./drivers.vcf"];
 
 self.addEventListener("install", function (e) {
